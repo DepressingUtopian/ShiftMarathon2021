@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <title>The Star Wars API</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <section class="form-wrapper">
+    <form class="search-form">
+      <input type="text" class="search" placeholder="Название планеты" title="Поле ввода">
+      <ul class="suggestions">
+        <li>Загрузка...</li>
+      </ul>
+    </form>
+  </section>
+  <script>
+
+    class SearchList {
+
+      constructor(data) {
+        this.currentListItems = [];
+        this.intl = new Intl.NumberFormat('ru-RU');
+        this.suggestions = document.querySelector('.suggestions');
+        this.initCurrentListItems(data);
+        this.addListener();
+        this.createPlanetList(this.currentListItems);
+      }
+
+      initCurrentListItems(data) {
+        Array.from(data).forEach(elem => this.currentListItems.push(
+          { name: elem.name, population: this.intl.format(Number(elem.population)) }));
+      }
+
+      filterListByPattern(list, pattern) {
+        return list.reduce((resultList, currentItem) => {
+          const patternResult = currentItem.name.toLowerCase().match(pattern);
+
+          if (patternResult && patternResult[0]) {
+            const copyItem = { ...currentItem };
+            copyItem.highlightedPart = patternResult[0];
+            resultList.push(copyItem);
+          }
+          return resultList;
+        }, []);
+      }
+
+      searchChangeHandler(event) {
+        const searchValue = event.target.value.toLowerCase();
+        const pattern = new RegExp(`${searchValue}`);
+        const filtredList = searchValue.length !== 0 ? this.filterListByPattern(this.currentListItems, pattern)
+          : this.currentListItems;
+
+        this.createPlanetList(filtredList);
+      }
+
+      addListener() {
+        document.querySelector('.search').addEventListener('input', (e) => this.searchChangeHandler(e));
+      }
+
+      getHighlighted(text, highlightedPart) {
+        const index = text.toLowerCase().indexOf(highlightedPart);
+        const indexEnd = index + (highlightedPart ? highlightedPart.length : 0);
+        const beginPart = text.substring(0, index);
+        const highPart = text.substring(index, indexEnd);
+        const endPart = text.substring(indexEnd);
+
+        return index >= 0 ? `${beginPart}<span class="highlighted">${highPart}</span>${endPart}` : text;
+      }
+
+      createListItem(elem) {
+        const item = document.createElement('li');
+        const spanName = document.createElement('span');
+        const spanPopulation = document.createElement('span');
+        const { name, population, highlightedPart } = elem;
+
+        spanName.classList.add('name');
+        spanPopulation.classList.add('population');
+
+        spanName.innerHTML = highlightedPart ? this.getHighlighted(name, highlightedPart) : name;
+        spanPopulation.innerHTML = population != 'не\u00A0число' ? population : 'Неизвестно';
+
+        item.appendChild(spanName);
+        item.appendChild(spanPopulation);
+
+        return item;
+      }
+
+      createPlanetList(data) {
+        this.suggestions.innerHTML = '';
+        Array.from(data).forEach((elem) => {
+          this.suggestions.appendChild(this.createListItem(elem));
+        });
+      }
+    }
+
+    function getPlanetData(url) {
+      getFetchData(url)
+        .then((result) => {
+          const searchList = new SearchList(result.results);
+        })
+        .catch((error) => console.error(error));
+    }
+
+    async function getFetchData(url) {
+      const response = await fetch(url);
+
+      if (response.ok) {
+        return await response.json();
+      } else {
+        return Promise.reject(`Код ошибки:${response.status} ${response.statusText}`);
+      }
+    }
+
+    const endpoint = 'https://swapi.dev/api/';
+    getPlanetData(endpoint + 'planets');
+
+  </script>
+</body>
+
+</html>
