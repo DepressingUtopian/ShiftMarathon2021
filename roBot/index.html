@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🤖 robot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet" type='text/css'>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="wrapper">
+
+    <h1>I'm not a robot 🤖</h1>
+
+    <select name="voice" id="voices">
+      <option value="">Выберите голос</option>
+    </select>
+
+    <label for="rate">Скорость:</label>
+    <input name="rate" type="range" min="1" max="2" value="1" step="0.1" oninput="resetSpeech()">
+
+    <label for="pitch">Тембер:</label>
+
+    <input name="pitch" type="range" min="0" max="3" step="0.1" oninput="resetSpeech()">
+    <textarea
+      name="text">Поздравляем, ты крутой фронтендер🔥 Осталось выполнить финальное задание - научить робота говорить😳</textarea>
+
+    <div class="robot">
+      <div class="head">
+        <div class="eyes">
+          <div class="eyeball eyeball_left"></div>
+          <div class="eyeball eyeball_right"></div>
+        </div>
+        <div class="mouth">
+          <div class="mouth-container">
+            <div class="mouth-container-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="stop-btn">Стоп</button>
+    <button id="speak-btn">Прочитать</button>
+
+  </div>
+
+  <div class='circle xxlarge shade1'></div>
+  <div class='circle xlarge shade2'></div>
+  <div class='circle large shade3'></div>
+  <div class='circle mediun shade4'></div>
+  <div class='circle small shade5'></div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none">
+    <defs>
+      <!-- Low -->
+      <filter id="low-0">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="0" />
+        <feDisplacementMap id="displacement" in="SourceGraphic" in2="noise" scale="1" />
+      </filter>
+      <filter id="low-1">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="30" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" />
+      </filter>
+      <filter id="low-2">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="2" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
+      </filter>
+      <filter id="low-3">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="30" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" />
+      </filter>
+      <filter id="low-4">
+        <feTurbulence id="turbulence" baseFrequency="0.1" numOctaves="3" result="noise" seed="4" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.5" />
+      </filter>
+      <!-- Listening -->
+      <filter id="listening-0">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="0" />
+        <feDisplacementMap id="displacement" in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="listening-1">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="30" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+      </filter>
+      <filter id="listening-2">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="2" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="listening-3">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="30" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+      </filter>
+      <filter id="listening-4">
+        <feTurbulence id="turbulence" baseFrequency="0.1" numOctaves="3" result="noise" seed="4" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
+      </filter>
+      <!-- Speaking -->
+      <filter id="speaking-0">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="0" />
+        <feDisplacementMap id="displacement" in="SourceGraphic" in2="noise" scale="12" />
+      </filter>
+      <filter id="speaking-1">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="30" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="13" />
+      </filter>
+      <filter id="speaking-2">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="2" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" />
+      </filter>
+      <filter id="speaking-3">
+        <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="30" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="13" />
+      </filter>
+      <filter id="speaking-4">
+        <feTurbulence id="turbulence" baseFrequency="0.1" numOctaves="3" result="noise" seed="4" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" />
+      </filter>
+    </defs>
+  </svg>
+
+  <script>
+    const maxRate = 10;
+    const minRate = 0.1;
+    const maxPitch = 2;
+    const minPitch = 0;
+
+    const synth = window.speechSynthesis;
+    const textarea = document.querySelector('textarea');
+    const options = document.querySelectorAll('[type="range"], [name="rate"]');
+    const voiceSelect = document.querySelector('[name="voice"]');
+    const speakButton = document.querySelector('#speak-btn');
+    const stopButton = document.querySelector('#stop-btn');
+    const robot = document.querySelector('.robot');
+    const speech = new SpeechSynthesisUtterance();
+
+    let voices = [];
+    let prevText = '';
+
+    options[1].setAttribute('min', minRate);
+    options[1].setAttribute('max', maxRate);
+    // options[0].setAttribute('value', 1);
+    // options[0].setAttribute('step', 0.1);
+
+    const onClickSpeakButton = () => {
+      speak(textarea.value, options[0]?.value, options[1]?.value);
+    };
+
+    const addEventListeners = () => {
+      speakButton.addEventListener('click', () => onClickSpeakButton());
+      stopButton.addEventListener('click', () => stopSpeech());
+
+      //Что-то не работает...
+      // options[0].addEventListener = ('input', () => resetSpeech());
+      // options[1].addEventListener = ('input', () => resetSpeech());
+    };
+
+    const getVoiceList = () => {
+      voices = synth.getVoices().sort(function (a, b) {
+        const aname = a.name.toUpperCase(), bname = b.name.toUpperCase();
+        if (aname < bname) return -1;
+        else if (aname == bname) return 0;
+        else return +1;
+      });
+
+      const selectedIndex = voiceSelect.selectedIndex < 0 ? 0 : voiceSelect.selectedIndex;
+      voiceSelect.innerHTML = '';
+      for (i = 0; i < voices.length; i++) {
+        let option = document.createElement('option');
+        option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
+
+        if (voices[i].default) {
+          option.textContent += ' -- DEFAULT';
+        }
+
+        option.setAttribute('data-lang', voices[i].lang);
+        option.setAttribute('data-name', voices[i].name);
+        voiceSelect.appendChild(option);
+      }
+      voiceSelect.selectedIndex = selectedIndex;
+    }
+
+    const initSpeech = () => {
+      speech.onend = function (event) {
+        robot.classList.remove('robot_speaking');
+      }
+
+      speech.onstart = function (event) {
+        robot.classList.add('robot_speaking');
+      }
+
+      speech.onerror = function (event) {
+        console.error('SpeechSynthesisUtterance.onerror');
+      }
+    }
+
+    const speak = (text, rateValue, pitchValue) => {
+
+      if (synth.speaking) {
+        stopSpeech();
+      }
+      //Можно навешать обработки на изменение, и тогда не придется каждый раз перезаписывать
+      const selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+      voices.forEach(voice => {
+        if (voice.name === selectedOption) {
+          speech.voice = voice;
+        }
+      });
+
+      speech.text = text;
+      speech.pitch = pitchValue;
+      speech.rate = rateValue;
+
+      synth.speak(speech);
+    }
+
+    const stopSpeech = () => synth.cancel();
+
+    const resetSpeech = () => {
+      if (synth.speaking) {
+        stopSpeech();
+        speak(textarea.value, options[0]?.value, options[1]?.value);
+      }
+    };
+
+    addEventListeners();
+    getVoiceList();
+    initSpeech();
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = getVoiceList;
+    }
+
+  </script>
+</body>
+
+</html>
